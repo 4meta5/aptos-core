@@ -6,22 +6,15 @@ use aptos_keygen::KeyGen;
 use aptos_types::transaction::authenticator::AuthenticationKey;
 
 fn main() {
-    let mut keygen = KeyGen::from_os_rng();
-    let (privkey, pubkey) = keygen.generate_ed25519_keypair();
+    let (privkey, auth_key, account_addr) =
+        KeyGen::from_os_rng().generate_credentials_for_account_creation();
 
-    println!("Private Key:");
-    println!("{}", privkey.to_encoded_string().unwrap());
-
-    println!();
-
-    let auth_key = AuthenticationKey::ed25519(&pubkey);
-    let account_addr = auth_key.derived_address();
-
-    println!("Auth Key:");
-    println!("{}", auth_key.to_encoded_string().unwrap());
-    println!();
-
-    println!("Account Address:");
-    println!("{}", account_addr);
-    println!();
+    println!(
+        "Private Key:\n{}\n\nAuth Key:\n{}\n\nAccount Address:\n{}\n\n",
+        privkey.to_encoded_string().unwrap(),
+        AuthenticationKey::new(auth_key.as_slice().try_into().unwrap())
+            .to_encoded_string()
+            .unwrap(),
+        account_addr,
+    );
 }
